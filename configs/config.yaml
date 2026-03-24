@@ -1,0 +1,53 @@
+# ────────────────────────── MODEL ──────────────────────────
+model:
+  d_model: 512
+  n_heads: 8
+  num_layers: 6
+  dim_ff: 2048
+  dropout: 0.1
+
+# ────────────────────────── DATA ───────────────────────────
+data:
+  train_sources:
+#    - data/PhoMT/train.csv
+    - data/opus100/train.csv
+  val_csv: data/opus100/dev.csv
+  test_csv: data/opus100/test.csv
+  min_len: 1
+  max_len: 128         
+  max_len_ratio: 3.04
+
+# ────────────────────────── TOKENIZER ──────────────────────
+tokenizer:
+  model_path: models/spm_tokenizer.model
+  vocab_size: 32000
+
+# ────────────────────────── TRAINING ───────────────────────
+training:
+  epochs: 20
+  batch_size: 16
+  warmup_steps: 4000
+  patience: 3           # Early stopping: dừng sau N epoch BLEU không tăng
+  max_val_batches: 200  # Giới hạn số batch validation mỗi epoch (null = toàn bộ)
+  val_batch_size: 32    # Batch size riêng cho validation (thường lớn hơn train)
+  grad_clip: 0.5
+  label_smoothing: 0.1
+  ckpt_interval: 10000  # Lưu checkpoint mỗi N batch
+  max_checkpoints: 3    # Giữ tối đa N checkpoint gần nhất
+  loss_csv: loss/loss_log.csv
+  seed: 42
+
+# ────────────────────────── CHECKPOINT ─────────────────────
+checkpoint:
+  save_dir: checkpoints/
+  best_model: checkpoints/best_model.pt
+  latest: checkpoints/latest.pt
+  resume: ""            # Đặt path để resume full state (opt, epoch, batch...)
+  init_model: ""        # Chỉ load model weights (bắt đầu run mới)
+
+# ────────────────────────── INFERENCE ──────────────────────
+inference:
+  method: beam          # "beam" hoặc "greedy"
+  beam_size: 5
+  max_len: 128
+  max_samples: null     # null = dùng toàn bộ test set

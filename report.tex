@@ -1,0 +1,726 @@
+% Compile with: pdflatex main.tex
+\documentclass[a4paper,12pt,twoside]{report}
+
+% ===== Vietnamese + Times-like text for pdfLaTeX =====
+\usepackage[T5]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[vietnamese]{babel}
+\usepackage{vntex}
+\usepackage{mathptmx} % Times-like font that works with Vietnamese under pdfLaTeX
+\usepackage{helvet}   % Sans font for chapter/title styling
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{titletoc}
+\usepackage{caption}
+\usepackage{enumitem}
+\usepackage{setspace}
+\usepackage{amsmath,amssymb}
+\usepackage[hidelinks]{hyperref}
+\usepackage{bookmark}
+\usepackage{tikz}
+\usetikzlibrary{positioning, arrows.meta, decorations.pathreplacing}
+\usepackage{eso-pic}
+\usepackage{float}
+\usepackage{array}
+
+% ===== Page layout =====
+\geometry{
+  a4paper,
+  top=2.2cm,
+  bottom=2.6cm,
+  inner=2.4cm,
+  outer=2.4cm,
+  headsep=0.7cm,
+  footskip=1.0cm
+}
+\setstretch{1.16}
+\setlength{\parindent}{1.1cm}
+\setlength{\parskip}{0.28em}
+\setlist[itemize]{topsep=0.2em,itemsep=0.35em,leftmargin=1.8cm}
+\setlist[enumerate]{topsep=0.2em,itemsep=0.35em,leftmargin=1.5cm}
+\captionsetup[figure]{labelfont=bf,textfont=bf,justification=centering}
+\captionsetup[table]{labelfont=bf,textfont=bf,justification=centering}
+
+% ===== Metadata / editable info =====
+\newcommand{\tentruong}{TRƯỜNG ĐẠI HỌC XÂY DỰNG HÀ NỘI}
+\newcommand{\tenkhoa}{KHOA CÔNG NGHỆ THÔNG TIN}
+\newcommand{\tenbomon}{BỘ MÔN KHOA HỌC MÁY TÍNH}
+\newcommand{\tenmon}{Xử lý ngôn ngữ tự nhiên}
+\newcommand{\loaibaocao}{BÁO CÁO BÀI TẬP LỚN}
+\newcommand{\tieudebaocao}{XỬ LÝ NGÔN NGỮ TỰ NHIÊN}
+\newcommand{\detai}{ỨNG DỤNG TRANSFORMER TRONG MÔ HÌNH DỊCH MÁY}
+\newcommand{\giangvien}{ThS.~Nguyễn Đình Quý}
+\newcommand{\ngaythang}{Hà Nội, tháng 03 năm 2026}
+
+% ===== General color =====
+\definecolor{ChapterGray}{gray}{0.45}
+
+% ===== Chapter / section styling =====
+\renewcommand{\chaptername}{Chương}
+\renewcommand{\thechapter}{\Roman{chapter}}
+\titleformat{\chapter}[block]
+  {\centering\normalfont\sffamily\bfseries\color{ChapterGray}\fontsize{26}{28}\selectfont}
+  {\chaptername~\thechapter:}{0.35em}{}
+\titlespacing*{\chapter}{0pt}{3.0cm}{1.15cm}
+
+\renewcommand{\thesection}{\arabic{section}}
+\renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
+\renewcommand{\thesubsubsection}{\thesubsection.\arabic{subsubsection}}
+
+\titleformat{\section}
+  {\normalfont\bfseries\fontsize{18}{20}\selectfont}
+  {\thesection.}{0.6em}{}
+\titleformat{\subsection}
+  {\normalfont\bfseries\fontsize{15}{17}\selectfont}
+  {\thesubsection}{0.5em}{}
+\titleformat{\subsubsection}
+  {\normalfont\bfseries\fontsize{13}{15}\selectfont}
+  {\thesubsubsection}{0.5em}{}
+
+% ===== TOC styling =====
+\renewcommand{\contentsname}{Mục lục}
+\titlecontents{chapter}
+  [0em]
+  {\vspace{0.6em}\bfseries}
+  {Chương~\thecontentslabel:~}
+  {}
+  {\titlerule*[0.7pc]{.}\contentspage}
+\titlecontents{section}
+  [1.6em]
+  {}
+  {}
+  {}
+  {\titlerule*[0.7pc]{.}\contentspage}
+\titlecontents{subsection}
+  [3.4em]
+  {}
+  {}
+  {}
+  {\titlerule*[0.7pc]{.}\contentspage}
+\makeatletter
+\renewcommand\tableofcontents{%
+  \clearpage
+  \markboth{\tenmon}{\tenmon}%
+  \vspace*{1.8cm}
+  \begin{center}
+    {\sffamily\bfseries\fontsize{22}{24}\selectfont\color{ChapterGray}\contentsname}
+  \end{center}
+  \vspace{0.9cm}
+  \@starttoc{toc}%
+}
+\makeatother
+
+% ===== Header / footer =====
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LO,RE]{\color{ChapterGray}\sffamily\bfseries\small \tenmon}
+\renewcommand{\headrulewidth}{0.4pt}
+\fancyfoot[C]{\thepage}
+\setlength{\headheight}{14.5pt}
+\fancypagestyle{plain}{%
+  \fancyhf{}
+  \fancyhead[LO,RE]{\color{ChapterGray}\sffamily\bfseries\small \tenmon}
+  \renewcommand{\headrulewidth}{0.4pt}
+  \fancyfoot[C]{\thepage}
+}
+
+% ===== Helper: student list =====
+\newcommand{\studentline}[1]{\\[0.18cm]#1}
+
+% ===== Cover frame =====
+\newcommand{\drawcoverframe}{%
+  \AddToShipoutPictureBG*{%
+    \begin{tikzpicture}[remember picture,overlay]
+      \draw[line width=1.5pt]
+        ([xshift=1.15cm,yshift=-1.15cm]current page.north west)
+        rectangle
+        ([xshift=-1.15cm,yshift=1.15cm]current page.south east);
+      \draw[line width=0.6pt]
+        ([xshift=1.35cm,yshift=-1.35cm]current page.north west)
+        rectangle
+        ([xshift=-1.35cm,yshift=1.35cm]current page.south east);
+    \end{tikzpicture}%
+  }%
+}
+
+% ===== Cover page =====
+\newcommand{\makecover}{%
+  \clearpage
+  \drawcoverframe
+  \thispagestyle{empty}
+  \begin{center}
+    \vspace*{0.35cm}
+    {\fontsize{20}{23}\selectfont \tentruong\par}
+    \vspace{0.12cm}
+    {\bfseries\fontsize{20}{23}\selectfont \tenkhoa\par}
+    \vspace{0.10cm}
+    {\fontsize{19}{22}\selectfont \tenbomon\par}
+
+    \vspace{1.0cm}
+    \includegraphics[width=4.2cm]{img/LOGO_DHXD.png}\par
+
+    \vspace{1.25cm}
+    {\bfseries\fontsize{26}{29}\selectfont \loaibaocao\par}
+    \vspace{0.10cm}
+    {\bfseries\fontsize{27}{31}\selectfont \tieudebaocao\par}
+
+    \vspace{0.95cm}
+    {\bfseries\fontsize{18}{21}\selectfont Đề tài: \detai\par}
+
+    \vspace{1.15cm}
+    \begin{minipage}{0.84\textwidth}
+      \fontsize{15}{18}\selectfont
+      \noindent\textbf{Giảng viên hướng dẫn:}\hspace{0.8em}\giangvien\par
+      \vspace{0.25cm}
+      \noindent\textbf{Sinh viên lớp:}\hspace{1.2em}%
+      \begin{minipage}[t]{0.70\textwidth} 
+      68CS2
+      \end{minipage}
+        \vspace{0.25cm}
+
+      \noindent\textbf{Sinh viên thực hiện:}\hspace{1.2em}%
+      \begin{minipage}[t]{0.70\textwidth}
+        Đỗ Quang Hợp\studentline{Trần Phùng Đức Anh}\studentline{Nguyễn Việt Anh}
+      \end{minipage}
+      
+        
+    
+    \end{minipage}
+
+    \vfill
+    {\bfseries\fontsize{16}{18}\selectfont \ngaythang\par}
+    \vspace*{0.75cm}
+  \end{center}
+  \clearpage
+}
+
+% ===== Unnumbered front chapter styled like sample =====
+\newcommand{\frontchapter}[1]{%
+  \chapter*{#1}
+  \addcontentsline{toc}{chapter}{#1}
+  \markboth{\tenmon}{\tenmon}
+}
+
+\begin{document}
+
+\makecover
+
+\tableofcontents
+
+\frontchapter{Lời nói đầu}
+Chúng em xin chân thành cảm ơn thầy \giangvien{} đã trang bị những kiến thức quý báu cho chúng em trong suốt quá trình học tập môn học phần \tenmon{}.
+
+Chính nhờ công giảng dạy, chỉ bảo tận tình của thầy mà chúng em mới có những kiến thức cơ bản để bước vào chuyên ngành và đặt những bước chân tiếp theo trên con đường học tập, vận dụng và sáng tạo ra những sản phẩm hữu ích.
+
+Mặc dù đã cố gắng nỗ lực thực hiện đề tài với quyết tâm cao, bài làm chắc chắn vẫn không thể tránh khỏi thiếu sót. Chúng em rất mong nhận được những ý kiến đóng góp của thầy để bài tập và kiến thức của chúng em ngày càng hoàn thiện hơn.
+
+\vspace{1cm}
+\begin{flushright}
+Em xin chân thành cảm ơn!\\[0.3cm]
+Ngày 14 tháng 05 năm 2025\\[1.6cm]
+\textbf{Từ các thành viên của nhóm}\\[0.35cm]
+\textbf{Đỗ Quang Hợp}\\[0.2cm]
+\textbf{Trần Phùng Đức Anh}\\[0.2cm]
+\textbf{Nguyễn Việt Anh}\\[0.2cm]
+\end{flushright}
+
+\chapter{Giới thiệu}
+\section{Giới thiệu đề tài}
+Dịch máy (Machine Translation) là một trong những bài toán quan trọng nhất của Xử lý Ngôn ngữ Tự nhiên (NLP). Tuy nhiên, các mô hình dịch thuật trước đây như RNN hay LSTM thường gặp hạn chế về tốc độ huấn luyện do khó xử lý song song và khả năng nhớ ngữ cảnh xa còn kém. 
+
+Năm 2017, sự ra đời của kiến trúc \textbf{Transformer} dựa trên cơ chế \textit{Self-Attention} đã khắc phục triệt để 2 nhược điểm này, đồng thời mang lại độ chính xác vượt trội. Nhận thấy tính ứng dụng và độ phổ biến cao của mô hình này trong thực tiễn, nhóm quyết định chọn đề tài \textbf{"Ứng dụng Transformer trong mô hình máy dịch"} nhằm nắm vững kiến thức cốt lõi và tự tay xây dựng được một hệ thống dịch thuật hiện đại.
+
+\section{Mục tiêu}
+\begin{itemize}
+    \item \textbf{Lý thuyết:} Tìm hiểu chi tiết kiến trúc Transformer (Cơ chế Self-Attention, Encoder-Decoder, Positional Encoding).
+    \item \textbf{Thực hành:} Tự lập trình và cài đặt mô hình Transformer để huấn luyện tác vụ dịch song ngữ (Ví dụ: Anh - Việt).
+    \item \textbf{Đánh giá:} Tiền xử lý dữ liệu đầu vào và đo lường chất lượng mô hình bằng độ đo tiêu chuẩn (BLEU score).
+\end{itemize}
+
+\section{Phạm vi}
+\begin{itemize}
+    \item Tập trung vào bài toán dịch văn bản thuần túy (Text-to-Text).
+    \item Hướng đến cài đặt cấu trúc Transformer gốc (Vanilla Transformer) thay vì sử dụng thư viện mô hình lớn có sẵn.
+    \item Huấn luyện và kiểm thử trên tập dữ liệu song ngữ vừa và nhỏ, tối ưu cho máy tính cá nhân.
+\end{itemize}
+
+\chapter{Các nghiên cứu liên quan}
+\section{Các mô hình dựa trên RNN}
+
+\subsection{Mạng nơ-ron hồi tiếp cơ bản}
+
+\textbf{Recurrent Neural Network (RNN)} là kiến trúc được thiết kế cho dữ liệu có tính tuần tự, trong đó biểu diễn tại thời điểm hiện tại phụ thuộc không chỉ vào đầu vào hiện tại mà còn vào thông tin tích lũy từ các bước trước đó. Khác với mạng truyền thẳng, RNN duy trì một \textit{trạng thái ẩn} (\textit{hidden state}) đóng vai trò như bộ nhớ ngữ cảnh của chuỗi.
+
+Với chuỗi đầu vào $X = (x_1, x_2, \dots, x_T)$, tại bước thời gian $t$, RNN cập nhật trạng thái ẩn theo công thức:
+\begin{equation}
+h_t = f(W_{xh}x_t + W_{hh}h_{t-1} + b_h)
+\end{equation}
+
+Đầu ra tại bước $t$ được tính bởi:
+\begin{equation}
+y_t = g(W_{hy}h_t + b_y)
+\end{equation}
+
+Trong đó:
+\begin{itemize}
+    \item $x_t$ là vector đầu vào tại thời điểm $t$;
+    \item $h_t$ là trạng thái ẩn, biểu diễn thông tin ngữ cảnh đã tích lũy đến bước $t$;
+    \item $y_t$ là đầu ra của mô hình;
+    \item $W_{xh}, W_{hh}, W_{hy}$ là các ma trận trọng số cần học;
+    \item $b_h, b_y$ là các vector lệch;
+    \item $f(\cdot)$ thường là hàm $\tanh$ hoặc sigmoid, còn $g(\cdot)$ tùy bài toán có thể là hàm tuyến tính hoặc softmax.
+\end{itemize}
+
+Về bản chất, RNN thực hiện cùng một phép biến đổi tại mọi bước thời gian, tức là các tham số được chia sẻ theo chiều thời gian. Cơ chế này cho phép mô hình xử lý chuỗi có độ dài biến đổi và khai thác phụ thuộc ngữ cảnh trong dữ liệu tuần tự. Trong xử lý ngôn ngữ tự nhiên, đây là đặc điểm đặc biệt quan trọng vì ý nghĩa của một từ thường phụ thuộc vào các từ xuất hiện trước đó trong câu.
+
+Tuy nhiên, RNN cơ bản tồn tại một hạn chế quan trọng: khi huấn luyện bằng lan truyền ngược theo thời gian (\textit{Backpropagation Through Time -- BPTT}), gradient phải đi qua nhiều bước lặp liên tiếp. Điều này dễ dẫn tới hiện tượng \textit{vanishing gradient} hoặc \textit{exploding gradient}, làm cho mô hình khó học được các quan hệ phụ thuộc dài hạn. Nói cách khác, RNN cơ bản có khả năng biểu diễn ngữ cảnh ngắn hạn tốt hơn ngữ cảnh dài hạn.
+
+\subsection{Mô hình LSTM}
+
+Để khắc phục giới hạn về bộ nhớ dài hạn của RNN, kiến trúc \textbf{Long Short-Term Memory (LSTM)} được đề xuất. Ý tưởng cốt lõi của LSTM là tách riêng hai thành phần:
+\begin{itemize}
+    \item \textit{hidden state} $h_t$: biểu diễn ngắn hạn phục vụ đầu ra tức thời;
+    \item \textit{cell state} $c_t$: kênh lưu trữ thông tin dài hạn.
+\end{itemize}
+
+LSTM sử dụng các cổng điều khiển để kiểm soát việc ghi nhớ, cập nhật và xuất thông tin. Nhờ đó, mô hình có thể duy trì tín hiệu quan trọng qua nhiều bước thời gian mà không bị suy giảm quá mạnh như RNN cơ bản.
+
+\subsubsection{Cổng quên}
+
+Cổng quên (\textit{forget gate}) quyết định phần nào của trạng thái tế bào trước đó $c_{t-1}$ sẽ được giữ lại:
+\begin{equation}
+f_t = \sigma(W_f[h_{t-1}, x_t] + b_f)
+\end{equation}
+
+Ở đây, $f_t$ là một vector có giá trị trong khoảng $[0,1]$. Giá trị càng gần 1 thì thông tin tương ứng càng được giữ lại; ngược lại, giá trị càng gần 0 thì thông tin càng bị loại bỏ.
+
+\subsubsection{Cổng vào}
+
+Cổng vào (\textit{input gate}) quyết định lượng thông tin mới sẽ được ghi vào bộ nhớ:
+\begin{equation}
+i_t = \sigma(W_i[h_{t-1}, x_t] + b_i)
+\end{equation}
+
+Song song với đó, một trạng thái ứng viên được tạo ra:
+\begin{equation}
+\tilde{c}_t = \tanh(W_c[h_{t-1}, x_t] + b_c)
+\end{equation}
+
+Vector $\tilde{c}_t$ biểu diễn nội dung mới mà mô hình đang xem xét đưa vào bộ nhớ dài hạn.
+
+\subsubsection{Cập nhật trạng thái tế bào}
+
+Trạng thái tế bào mới được cập nhật bằng cách kết hợp thông tin cũ và thông tin mới:
+\begin{equation}
+c_t = f_t \odot c_{t-1} + i_t \odot \tilde{c}_t
+\end{equation}
+
+Trong đó, ký hiệu $\odot$ là phép nhân theo từng phần tử. Phương trình trên thể hiện rõ hai thao tác cốt lõi của LSTM: \textit{quên có chọn lọc} và \textit{ghi nhớ có chọn lọc}.
+
+\subsubsection{Cổng ra}
+
+Cổng ra (\textit{output gate}) điều khiển phần thông tin nào của trạng thái tế bào được đưa ra ngoài dưới dạng trạng thái ẩn:
+\begin{equation}
+o_t = \sigma(W_o[h_{t-1}, x_t] + b_o)
+\end{equation}
+
+Trạng thái ẩn tại bước $t$ được tính bởi:
+\begin{equation}
+h_t = o_t \odot \tanh(c_t)
+\end{equation}
+
+Với cấu trúc này, LSTM không chỉ lưu trữ ngữ cảnh mà còn kiểm soát chặt chẽ luồng thông tin qua thời gian. Do đó, LSTM đặc biệt phù hợp với các bài toán yêu cầu mô hình hóa phụ thuộc dài hạn, ví dụ như mô hình ngôn ngữ, phân tích chuỗi và dịch máy neural.
+
+Mặc dù hiệu quả hơn RNN cơ bản, LSTM có cấu trúc phức tạp hơn, số lượng tham số lớn hơn và chi phí tính toán cao hơn. Đây là đánh đổi phổ biến giữa năng lực biểu diễn và hiệu năng huấn luyện.
+
+\subsection{Mô hình hai chiều}
+
+RNN và LSTM chuẩn chỉ khai thác ngữ cảnh theo một hướng thời gian, thường là từ trái sang phải. Tuy nhiên, trong nhiều bài toán xử lý ngôn ngữ tự nhiên, việc hiểu một từ thường đòi hỏi đồng thời cả ngữ cảnh đứng trước và ngữ cảnh đứng sau. Để giải quyết vấn đề này, kiến trúc \textbf{Bidirectional RNN (BiRNN)} được sử dụng.
+
+BiRNN gồm hai mạng hồi tiếp độc lập:
+\begin{itemize}
+    \item một mạng xử lý chuỗi theo chiều thuận từ trái sang phải;
+    \item một mạng xử lý chuỗi theo chiều nghịch từ phải sang trái.
+\end{itemize}
+
+Biểu diễn hai chiều tại vị trí $t$ được xác định như sau:
+\begin{equation}
+\overrightarrow{h_t} = f(W^{fw}_{xh}x_t + W^{fw}_{hh}\overrightarrow{h_{t-1}} + b^{fw}_h)
+\end{equation}
+
+\begin{equation}
+\overleftarrow{h_t} = f(W^{bw}_{xh}x_t + W^{bw}_{hh}\overleftarrow{h_{t+1}} + b^{bw}_h)
+\end{equation}
+
+\begin{equation}
+h_t = [\overrightarrow{h_t}; \overleftarrow{h_t}]
+\end{equation}
+
+Trong đó, $[\cdot;\cdot]$ ký hiệu phép nối vector. Nhờ cơ chế này, biểu diễn tại mỗi vị trí chứa đồng thời thông tin từ quá khứ và tương lai tương đối của chuỗi.
+
+Khi áp dụng cơ chế hai chiều cho LSTM, ta thu được \textbf{BiLSTM}. Đây là kiến trúc được sử dụng rộng rãi trong các tác vụ như gán nhãn từ loại, nhận dạng thực thể có tên và phân tích chuỗi, vì nó tạo ra biểu diễn ngữ cảnh đầy đủ hơn so với mô hình đơn hướng.
+
+Tuy nhiên, cần lưu ý rằng kiến trúc hai chiều phù hợp chủ yếu với các bài toán \textit{mã hóa} hoặc \textit{gán nhãn}, nơi toàn bộ chuỗi đầu vào đã sẵn có. Đối với các bài toán sinh chuỗi tự hồi quy, đặc biệt ở phía decoder, việc sử dụng thông tin từ ``tương lai'' là không khả thi.
+
+\subsection{Mô hình Sequence-to-Sequence dựa trên RNN}
+
+Một trong những ứng dụng quan trọng nhất của RNN/LSTM trong dịch máy là kiến trúc \textbf{Sequence-to-Sequence (Seq2Seq)}. Mô hình này ánh xạ một chuỗi nguồn sang một chuỗi đích có thể khác độ dài, thông qua hai thành phần cơ bản:
+\begin{itemize}
+    \item \textbf{Encoder}: biến đổi chuỗi nguồn thành biểu diễn ngữ nghĩa;
+    \item \textbf{Decoder}: sinh chuỗi đích dựa trên biểu diễn đó.
+\end{itemize}
+
+\subsubsection{Encoder}
+
+Cho câu nguồn $X = (x_1, x_2, \dots, x_T)$, encoder đọc tuần tự các token và cập nhật trạng thái:
+\begin{equation}
+h_t = f_{enc}(x_t, h_{t-1})
+\end{equation}
+
+Trong mô hình Seq2Seq cơ bản, trạng thái cuối cùng của encoder, thường ký hiệu là $h_T$ hoặc một biến đổi từ nó, được xem như \textit{vector ngữ cảnh} $c$:
+\begin{equation}
+c = h_T
+\end{equation}
+
+Vector $c$ đóng vai trò như một biểu diễn nén của toàn bộ câu nguồn.
+
+\subsubsection{Decoder}
+
+Decoder sinh chuỗi đích từng bước một. Tại thời điểm $t$, nó cập nhật trạng thái ẩn dựa trên từ đích trước đó, trạng thái trước đó và vector ngữ cảnh:
+\begin{equation}
+s_t = f_{dec}(y_{t-1}, s_{t-1}, c)
+\end{equation}
+
+Xác suất sinh token tiếp theo được tính bởi:
+\begin{equation}
+P(y_t \mid y_{<t}, X) = \text{softmax}(W_os_t + b_o)
+\end{equation}
+
+Về ngữ nghĩa, decoder thực hiện mô hình hóa xác suất có điều kiện của câu đích theo câu nguồn:
+\begin{equation}
+P(Y \mid X) = \prod_{t=1}^{T'} P(y_t \mid y_{<t}, X)
+\end{equation}
+
+Trong đó $Y = (y_1, y_2, \dots, y_{T'})$ là chuỗi đích. Công thức trên cho thấy quá trình dịch được phân rã thành chuỗi các quyết định sinh token kế tiếp, mỗi quyết định phụ thuộc vào ngữ cảnh nguồn và phần đích đã sinh trước đó.
+
+Ưu điểm quan trọng của Seq2Seq là khả năng ánh xạ giữa hai chuỗi có độ dài khác nhau trong một khung học thống nhất. Tuy nhiên, phiên bản cơ bản tồn tại một điểm nghẽn rõ rệt: toàn bộ nội dung câu nguồn phải được nén vào một vector cố định $c$. Khi câu nguồn dài hoặc có cấu trúc phức tạp, khả năng biểu diễn của một vector duy nhất thường không đủ, dẫn tới mất mát thông tin.
+
+\subsection{Cơ chế Attention trong Seq2Seq}
+
+Để giải quyết giới hạn của vector ngữ cảnh cố định, cơ chế \textbf{Attention} được tích hợp vào mô hình Seq2Seq. Thay vì buộc decoder phụ thuộc hoàn toàn vào một biểu diễn nén toàn cục, attention cho phép decoder truy cập trực tiếp tới toàn bộ các trạng thái encoder tại mỗi bước sinh.
+
+Giả sử encoder tạo ra tập trạng thái:
+\begin{equation}
+H = \{h_1, h_2, \dots, h_T\}
+\end{equation}
+
+Tại bước giải mã $t$, decoder tính điểm tương thích giữa trạng thái hiện tại và từng trạng thái encoder:
+\begin{equation}
+e_{t,i} = \text{score}(s_{t-1}, h_i)
+\end{equation}
+
+Sau đó, các điểm này được chuẩn hóa bằng softmax để tạo phân phối chú ý:
+\begin{equation}
+\alpha_{t,i} = \frac{\exp(e_{t,i})}{\sum_{j=1}^{T} \exp(e_{t,j})}
+\end{equation}
+
+Vector ngữ cảnh động tại bước $t$ được tính bằng tổ hợp có trọng số của các trạng thái encoder:
+\begin{equation}
+c_t = \sum_{i=1}^{T} \alpha_{t,i} h_i
+\end{equation}
+
+Ở đây, $\alpha_{t,i}$ biểu diễn mức độ mà decoder ``chú ý'' tới vị trí nguồn thứ $i$ khi sinh token đích tại bước $t$. Do các trọng số được chuẩn hóa, ta có:
+\begin{equation}
+\sum_{i=1}^{T} \alpha_{t,i} = 1
+\end{equation}
+
+Về mặt ngữ nghĩa, attention cho phép mô hình thực hiện một dạng căn chỉnh mềm (\textit{soft alignment}) giữa chuỗi nguồn và chuỗi đích. Thay vì nén toàn bộ câu nguồn vào một điểm duy nhất, decoder có thể chọn lọc những phần thông tin liên quan nhất tại từng thời điểm sinh. Đây là cải tiến có ý nghĩa quyết định đối với dịch máy neural, đặc biệt với các câu dài, trật tự từ phức tạp hoặc sự tương ứng giữa từ nguồn và từ đích không tuyến tính.
+
+Trong thực tế, trạng thái decoder thường được tính kết hợp với vector ngữ cảnh động, hoặc đầu ra cuối cùng của decoder sẽ phụ thuộc đồng thời vào $s_t$ và $c_t$. Dù cách hiện thực có thể khác nhau, bản chất của attention vẫn là cơ chế truy xuất ngữ cảnh có trọng số từ phía encoder.
+
+\subsection{Đánh giá và vai trò trong dịch máy}
+
+Các mô hình dựa trên RNN, đặc biệt là LSTM và Seq2Seq kết hợp attention, đã đặt nền tảng cho thế hệ đầu tiên của \textit{Neural Machine Translation}. Chúng đưa bài toán dịch máy từ cách tiếp cận dựa trên luật hoặc mô hình thống kê sang cách tiếp cận học biểu diễn đầu-cuối (\textit{end-to-end representation learning}).
+
+Từ góc độ kỹ thuật, có thể tóm tắt vai trò của các thành phần như sau:
+\begin{itemize}
+    \item \textbf{RNN}: cung cấp cơ chế mô hình hóa chuỗi và ngữ cảnh tuần tự;
+    \item \textbf{LSTM}: cải thiện khả năng lưu trữ thông tin dài hạn thông qua cấu trúc cổng;
+    \item \textbf{BiLSTM}: tăng cường chất lượng biểu diễn bằng cách khai thác ngữ cảnh hai chiều;
+    \item \textbf{Seq2Seq}: thiết lập khung ánh xạ giữa chuỗi nguồn và chuỗi đích;
+    \item \textbf{Attention}: loại bỏ nút cổ chai của vector ngữ cảnh cố định, tăng khả năng căn chỉnh và chất lượng sinh.
+\end{itemize}
+
+Mặc dù đạt nhiều thành công, các mô hình này vẫn tồn tại các hạn chế cố hữu:
+\begin{itemize}
+    \item tính toán tuần tự theo thời gian nên khó song song hóa;
+    \item chi phí huấn luyện và suy luận tăng đáng kể khi chuỗi dài;
+    \item khả năng mô hình hóa phụ thuộc rất xa vẫn bị giới hạn;
+    \item hiệu quả mở rộng trên tập dữ liệu lớn kém hơn các kiến trúc attention thuần túy.
+\end{itemize}
+
+Chính các hạn chế này là động lực trực tiếp dẫn đến sự ra đời của Transformer, nơi cơ chế attention được khai thác như thành phần trung tâm mà không cần cấu trúc hồi tiếp.
+
+\subsection{Kết luận}
+
+Các mô hình dựa trên RNN là giai đoạn phát triển mang tính nền tảng của xử lý ngôn ngữ tự nhiên hiện đại. RNN cơ bản giới thiệu cơ chế biểu diễn tuần tự thông qua trạng thái ẩn; LSTM giải quyết tốt hơn bài toán phụ thuộc dài hạn; BiLSTM mở rộng khả năng khai thác ngữ cảnh theo cả hai chiều; còn Seq2Seq kết hợp attention đã tạo ra bước tiến lớn trong dịch máy neural.
+
+Dù hiện nay các mô hình Transformer chiếm ưu thế, việc hiểu rõ họ mô hình RNN vẫn có ý nghĩa quan trọng về cả phương diện lý thuyết lẫn lịch sử phát triển. Đây là cơ sở để làm rõ quá trình chuyển dịch từ mô hình tuần tự hồi tiếp sang mô hình attention song song trong các hệ dịch máy hiện đại.
+
+\chapter{Phương pháp}
+
+\section{Kiến trúc tổng quan áp dụng cho Dịch máy}
+
+Hệ thống dịch máy trong đề tài này được xây dựng trên kiến trúc Transformer gốc \cite{vaswani2017attention}, vận hành theo mô hình Encoder--Decoder quen thuộc nhưng loại bỏ hoàn toàn cơ chế hồi quy (recurrence). Thay vào đó, toàn bộ quá trình ``đọc hiểu'' và ``sinh câu'' đều dựa trên cơ chế Attention --- cho phép xử lý song song mọi vị trí trong câu cùng lúc \cite{nlp_ebook}.
+
+Luồng dữ liệu diễn ra như sau: câu nguồn (ví dụ tiếng Anh) được đưa qua lớp \textit{Embedding}, cộng thêm \textit{Positional Encoding} rồi đẩy vào chồng $N = 6$ lớp \textbf{Encoder}. Mỗi lớp Encoder gồm hai khối con nối tiếp: (1) \textit{Multi-Head Self-Attention} để các từ trong câu nguồn ``nhìn'' lẫn nhau, và (2) \textit{Feed-Forward Network} (FFN) --- một mạng truyền thẳng hai lớp giúp biến đổi phi tuyến riêng từng vị trí. Cả hai khối đều được bao bọc bởi \textit{Residual Connection} cộng \textit{Layer Normalization} nhằm ổn định gradient khi lan truyền ngược qua 6 tầng xếp chồng. Đầu ra Encoder là bộ biểu diễn ngữ cảnh $\mathbf{H}_{\text{enc}} \in \mathbb{R}^{n \times 512}$.
+
+Phía \textbf{Decoder} cũng gồm 6 lớp, mỗi lớp có thêm một khối \textit{Cross-Attention} xen giữa. Khối này lấy Query từ Decoder, Key và Value từ Encoder, qua đó mỗi từ đích ``truy vấn'' được ngữ cảnh câu nguồn. Decoder sinh từ theo cơ chế tự hồi quy: từ thứ $t$ chỉ phụ thuộc vào các từ $y_{<t}$ đã sinh trước đó. Cuối cùng, lớp \textit{Linear + Softmax} chuyển vector ẩn thành phân phối xác suất trên bộ từ vựng đích.
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+        node distance=0.55cm,
+        comp/.style={draw, rectangle, minimum width=2.8cm, minimum height=0.7cm, align=center, font=\footnotesize, fill=blue!12},
+        norm/.style={draw, rectangle, minimum width=2.8cm, minimum height=0.55cm, align=center, font=\scriptsize},
+        iobox/.style={draw, rectangle, minimum width=2.4cm, minimum height=0.6cm, align=center, font=\footnotesize},
+        circ/.style={draw, circle, minimum size=0.5cm, font=\footnotesize, inner sep=0pt},
+        arr/.style={-stealth, thick},
+        every node/.append style={font=\footnotesize},
+    ]
+        % ======== ENCODER (left) ========
+        \node[iobox] (src) {Sources};
+        \node[iobox, above=0.4cm of src] (emb_enc) {Embedding};
+        \node[circ, above=0.35cm of emb_enc] (plus_enc) {$\oplus$};
+        \node[font=\scriptsize, align=center, left=0.6cm of plus_enc] (pe_enc) {Positional\\encoding};
+
+        \node[comp, above=0.7cm of plus_enc] (mha_enc) {Multi-head\\attention};
+        \node[norm, above=0.35cm of mha_enc] (an1_enc) {Add \& norm};
+        \node[comp, above=0.35cm of an1_enc] (ffn_enc) {Positionwise\\FFN};
+        \node[norm, above=0.35cm of ffn_enc] (an2_enc) {Add \& norm};
+
+        \draw[dashed, thick, rounded corners=4pt]
+            ([xshift=-0.55cm, yshift=-0.25cm]mha_enc.south west)
+            rectangle
+            ([xshift=0.55cm, yshift=0.25cm]an2_enc.north east);
+        \node[font=\scriptsize, left=0.75cm of an1_enc] {$n\times$};
+        \node[above=0.45cm of an2_enc, font=\small\bfseries] (enc_label) {Encoder};
+
+        \draw[arr] (src) -- (emb_enc);
+        \draw[arr] (emb_enc) -- (plus_enc);
+        \draw[arr] (pe_enc) -- (plus_enc);
+        \draw[arr] (plus_enc) -- (mha_enc);
+        \draw[arr] (mha_enc) -- (an1_enc);
+        \draw[arr] (an1_enc) -- (ffn_enc);
+        \draw[arr] (ffn_enc) -- (an2_enc);
+
+        % ======== DECODER (right) ========
+        \node[iobox, right=4.0cm of src] (tgt) {Targets};
+        \node[iobox, above=0.4cm of tgt] (emb_dec) {Embedding};
+        \node[circ, above=0.35cm of emb_dec] (plus_dec) {$\oplus$};
+        \node[font=\scriptsize, align=center, right=0.6cm of plus_dec] (pe_dec) {Positional\\encoding};
+
+        \node[comp, above=0.7cm of plus_dec] (mmha_dec) {Masked\\multi-head\\attention};
+        \node[norm, above=0.35cm of mmha_dec] (an1_dec) {Add \& norm};
+        \node[comp, above=0.35cm of an1_dec] (mha_dec) {Multi-head\\attention};
+        \node[norm, above=0.35cm of mha_dec] (an2_dec) {Add \& norm};
+        \node[comp, above=0.35cm of an2_dec] (ffn_dec) {Positionwise\\FFN};
+        \node[norm, above=0.35cm of ffn_dec] (an3_dec) {Add \& norm};
+
+        \draw[dashed, thick, rounded corners=4pt]
+            ([xshift=-0.55cm, yshift=-0.25cm]mmha_dec.south west)
+            rectangle
+            ([xshift=0.55cm, yshift=0.25cm]an3_dec.north east);
+        \node[font=\scriptsize, right=0.75cm of an2_dec] {$\times n$};
+
+        \node[iobox, above=0.55cm of an3_dec] (fc) {FC};
+        \node[above=0.35cm of fc, font=\small\bfseries] (dec_label) {Decoder};
+
+        \draw[arr] (tgt) -- (emb_dec);
+        \draw[arr] (emb_dec) -- (plus_dec);
+        \draw[arr] (pe_dec) -- (plus_dec);
+        \draw[arr] (plus_dec) -- (mmha_dec);
+        \draw[arr] (mmha_dec) -- (an1_dec);
+        \draw[arr] (an1_dec) -- (mha_dec);
+        \draw[arr] (mha_dec) -- (an2_dec);
+        \draw[arr] (an2_dec) -- (ffn_dec);
+        \draw[arr] (ffn_dec) -- (an3_dec);
+        \draw[arr] (an3_dec) -- (fc);
+
+        % Cross-attention
+        \draw[arr] (an2_enc.east) -- ++(0.8,0) |- (mha_dec.west);
+    \end{tikzpicture}
+    \caption{Kiến trúc Transformer áp dụng cho dịch máy \cite{vaswani2017attention, nlp_ebook}.}
+    \label{fig:transformer_arch}
+\end{figure}
+
+\section{Các cơ chế Attention}
+Cơ chế Attention là thành phần quyết định sức mạnh của Transformer. Ý tưởng cốt lõi: khi biểu diễn một từ, mô hình tính trọng số ``mức độ liên quan'' của nó với mọi từ còn lại, rồi tổng hợp thông tin theo trọng số đó. Cụ thể, mỗi token được chiếu thành ba vector --- Query ($Q$), Key ($K$), Value ($V$) --- qua các ma trận trọng số học được. Công thức \textit{Scaled Dot-Product Attention} \cite{vaswani2017attention}:
+\begin{equation}
+    \text{Attention}(Q, K, V) = \text{softmax}\!\left(\frac{QK^T}{\sqrt{d_k}}\right) V
+    \label{eq:attention}
+\end{equation}
+Phép chia cho $\sqrt{d_k}$ giữ cho tích vô hướng không quá lớn, tránh gradient bão hòa trong softmax. Để nắm bắt nhiều khía cạnh ngữ nghĩa cùng lúc, Transformer dùng $h = 8$ nhánh Attention chạy song song (\textit{Multi-Head}) rồi ghép nối kết quả \cite{vaswani2017attention}:
+\begin{equation}
+    \text{MultiHead}(Q,K,V) = \text{Concat}(\text{head}_1, \ldots, \text{head}_h)\, W^O, \quad
+    \text{head}_i = \text{Attention}(QW_i^Q, KW_i^K, VW_i^V)
+\end{equation}
+
+Trong kiến trúc Transformer cho dịch máy, Attention xuất hiện ở ba vị trí với vai trò khác nhau:
+\begin{itemize}
+    \item \textbf{Self-Attention (Encoder):} $Q, K, V$ đều đến từ câu nguồn. Mỗi từ nguồn ``hỏi'' tất cả các từ nguồn khác để hiểu ngữ cảnh toàn câu.
+    \item \textbf{Masked Self-Attention (Decoder):} $Q, K, V$ đều từ câu đích, nhưng có thêm \textit{mask} che phủ các vị trí tương lai. Cụ thể, khi sinh từ thứ $t$, ma trận attention bị gán $-\infty$ tại các cột $> t$ trước khi qua softmax, buộc xác suất chú ý vào từ chưa sinh bằng 0. Điều này đảm bảo mô hình không ``nhìn lén'' đáp án phía sau --- đúng với bản chất tự hồi quy của quá trình dịch.
+    \item \textbf{Cross-Attention (Decoder):} $Q$ từ Decoder, $K$ và $V$ từ đầu ra Encoder. Đây là cầu nối quan trọng nhất: mỗi từ đích đang sinh ra sẽ ``truy vấn'' toàn bộ câu nguồn để tìm đúng phần thông tin cần dịch.
+\end{itemize}
+
+\textbf{Ví dụ minh họa:} Xét câu 2 từ $[\text{``Học''},\; \text{``máy''}]$ với $d_k = 4$. Sau phép chiếu ta có:
+$$
+Q = \begin{bmatrix} 2 & 0 & 0 & 0 \\ 0 & 2 & 0 & 0 \end{bmatrix},\;
+K = \begin{bmatrix} 2 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \end{bmatrix},\;
+V = \begin{bmatrix} 1 & 2 & 3 & 4 \\ 5 & 6 & 7 & 8 \end{bmatrix}
+$$
+Qua các bước tính $QK^T / \sqrt{d_k}$ rồi softmax, ma trận trọng số attention thu được:
+$$
+A \approx \begin{bmatrix} 0.88 & 0.12 \\ 0.27 & 0.73 \end{bmatrix}
+\quad \Rightarrow \quad
+\text{Output} = A \cdot V \approx \begin{bmatrix} 1.48 & 2.48 & 3.48 & 4.48 \\ 3.92 & 4.92 & 5.92 & 6.92 \end{bmatrix}
+$$
+Đọc ma trận $A$: từ ``Học'' dồn $88\%$ sự chú ý vào chính nó và $12\%$ vào ``máy''; ngược lại ``máy'' dành $27\%$ cho ``Học''. Nhờ vậy, mô hình phân biệt được ``học máy'' với ``cái máy đang học bài'' dù cùng bộ từ.
+
+Sau Attention, luồng dữ liệu cần được bổ sung thông tin vị trí --- vì bản thân Attention hoàn toàn không phân biệt thứ tự từ. Đây là lý do Positional Encoding ra đời.
+
+\section{Mã hóa thông tin vị trí (Positional Encoding)}
+Transformer xử lý mọi token đồng thời, nên nếu không can thiệp thêm, câu ``Mẹ thương con'' và ``Con thương mẹ'' sẽ cho biểu diễn giống hệt nhau --- rõ ràng sai về ngữ nghĩa. \textbf{Positional Encoding} (PE) khắc phục bằng cách tiêm ``mã vạch vị trí'' vào vector Embedding. Bài báo gốc sử dụng hàm sin--cos với tần số thay đổi theo chiều \cite{vaswani2017attention}:
+\begin{align}
+    PE_{(pos,\, 2i)}   &= \sin\!\left(\frac{pos}{10000^{\,2i/d_{\text{model}}}}\right) \\
+    PE_{(pos,\, 2i+1)} &= \cos\!\left(\frac{pos}{10000^{\,2i/d_{\text{model}}}}\right)
+\end{align}
+Mỗi vị trí nhận một bộ tọa độ duy nhất, và khoảng cách tương đối giữa hai vị trí bất kỳ có thể biểu diễn bằng phép biến đổi tuyến tính trên PE. Vector PE được cộng trực tiếp vào Embedding: $\mathbf{x}_{\text{input}} = \text{Embedding}(w) + PE_{pos}$.
+
+\begin{table}[H]
+    \centering
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{|c|c|c|c|c|}
+        \hline
+        $pos$ & $PE_0\;(\sin)$ & $PE_1\;(\cos)$ & $PE_2\;(\sin)$ & $PE_3\;(\cos)$ \\
+        \hline
+        $0$ & $0$ & $1$ & $0$ & $1$ \\
+        \hline
+        $1$ & $0.841$ & $0.540$ & $0.010$ & $1.000$ \\
+        \hline
+    \end{tabular}
+    \caption{PE với $d_{\text{model}} = 4$. Chiều tần số thấp ($i\!=\!0$) thay đổi nhanh, chiều cao ($i\!=\!1$) gần như không đổi.}
+    \label{tab:pe_example}
+\end{table}
+
+\section{Tối ưu hóa mô hình (Hàm mục tiêu)}
+Tại mỗi bước giải mã, mô hình xuất phân phối xác suất trên bộ từ vựng đích kích thước $V$ và đối chiếu với từ đúng bằng hàm \textbf{Cross-Entropy Loss} \cite{nlp_ebook}:
+\begin{equation}
+    \mathcal{L} = -\frac{1}{T}\sum_{t=1}^{T} \log\, p(y_t \mid y_{<t},\, X)
+\end{equation}
+
+Tuy nhiên, nếu nhãn huấn luyện là one-hot ``cứng'' (xác suất $1.0$ cho từ đúng, $0$ cho phần còn lại), mô hình dễ trở nên quá tự tin và overfitting. Vaswani và cộng sự \cite{vaswani2017attention} áp dụng kỹ thuật \textbf{Label Smoothing} ($\epsilon_{ls} = 0.1$): nhãn đúng giảm xuống $0.9$, phần $0.1$ còn lại rải đều cho các từ khác. Nói đơn giản, thay vì ép mô hình ``chắc chắn 100\%'', ta cho phép nó ``nghi ngờ nhẹ'' --- nhờ vậy điểm BLEU trên tập kiểm thử tăng đáng kể so với khi không dùng.
+
+\chapter{Thực nghiệm}
+
+\section{Tập dữ liệu và Quy trình thực nghiệm}
+Để đạt được hiệu quả dịch thuật tốt nhất, thực nghiệm được chia thành hai giai đoạn (phase) chiến lược:
+
+\begin{itemize}
+    \item \textbf{Phase 1: Pre-training trên OPUS-100.} Nhóm sử dụng tập \textbf{OPUS-100} (English-Vietnamese) — một tập dữ liệu quy mô lớn đa lĩnh vực. Mục tiêu của giai đoạn này là giúp mô hình học được các cấu trúc ngữ pháp cơ bản, các từ vựng phổ thông và khả năng căn chỉnh (alignment) sơ bộ giữa hai ngôn ngữ.
+    \item \textbf{Phase 2: Fine-tuning trên PhoMT.} Sau khi mô hình đã có kiến thức nền tảng, nhóm tiến hành tinh chỉnh (Fine-tune) mô hình trên tập dữ liệu \textbf{PhoMT}. Đây là bộ dữ liệu chất lượng cao, tập trung vào các ngữ cảnh chuyên sâu, chuyên nghiệp và gần gũi hơn với văn phong Việt Nam hiện đại. Việc này giúp cải thiện đáng kể độ tự nhiên và độ chính xác chuyên biệt của bản dịch.
+\end{itemize}
+
+Dữ liệu PhoMT và OPUS được chia theo tỷ lệ chuẩn của các bộ dataset gốc với các tập Train, Validation và Test độc lập để đảm bảo tính khách quan của phép đo.
+
+\section{Tiền xử lý dữ liệu}
+Để mô hình Transformer xử lý được văn bản thô, nhóm tiến hành các bước tiền xử lý như sau:
+\begin{itemize}
+    \item \textbf{Tokenization (Tách từ):} Sử dụng thuật toán \textbf{SentencePiece} với mô hình BPE (Byte Pair Encoding) để phân tách văn bản thành các đơn vị subword. Phương pháp này giúp mô hình xử lý tốt các từ hiếm và từ chưa từng xuất hiện trong bộ từ vựng (Out-Of-Vocabulary).
+    \item \textbf{Bộ từ vựng (Vocabulary):} Xây dựng bộ từ vựng chung cho cả hai ngôn ngữ với kích thước $32.000$ token.
+    \item \textbf{Đánh dấu chuỗi:} Thêm các mã đặc biệt vào mỗi câu: \texttt{<s>} (token bắt đầu) và \texttt{</s>} (token kết thúc).
+    \item \textbf{Lọc và cắt tỉa:} 
+    \begin{itemize}
+        \item Giới hạn độ dài tối đa của mỗi câu là $128$ token để tối ưu hóa bộ nhớ và tốc độ tính toán.
+        \item Loại bỏ các cặp câu có tỷ lệ độ dài quá chênh lệch (ngưỡng $3.04$) để đảm bảo chất lượng liên kết giữa câu nguồn và câu đích.
+    \end{itemize}
+    \item \textbf{Padding:} Sử dụng token \texttt{<pad>} để lấp đầy các câu ngắn hơn độ dài tối đa trong cùng một batch, giúp mô hình xử lý song song hiệu quả.
+\end{itemize}
+
+\section{Cấu hình huấn luyện}
+Quá trình huấn luyện được thực hiện với các thiết lập siêu tham số tuân theo kiến trúc Transformer nguyên bản (Vanilla Transformer):
+
+\begin{table}[H]
+\centering
+\caption{Siêu tham số của mô hình và quá trình huấn luyện}
+\label{tab:hyperparams}
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Tham số} & \textbf{Giá trị} \\ \hline
+Số lớp Encoder ($N$) & 6 \\ \hline
+Số lớp Decoder ($N$) & 6 \\ \hline
+Số đầu Attention ($h$) & 8 \\ \hline
+Kích thước vector ẩn ($d_{model}$) & 512 \\ \hline
+Kích thước lớp Feed-forward ($d_{ff}$) & 2048 \\ \hline
+Tỷ lệ Dropout & 0.1 \\ \hline
+Tối ưu hóa (Optimizer) & Adam ($\beta_1=0.9, \beta_2=0.98$) \\ \hline
+Lịch trình học (Scheduler) & Noam (Warmup: 4000 steps) \\ \hline
+Hàm mất mát (Loss function) & Cross-Entropy + Label Smoothing (0.1) \\ \hline
+Kích thước lô (Batch size) & 16 (Train) / 32 (Validation) \\ \hline
+Ngưỡng cắt gradient (Grad Clip) & 0.5 \\ \hline
+\end{tabular}
+\end{table}
+
+Nhóm cũng áp dụng kỹ thuật \textbf{Dừng sớm (Early Stopping)} với độ kiên nhẫn (patience) là 3 epoch. Nếu điểm BLEU trên tập kiểm định không được cải thiện trong 3 chu kỳ liên tiếp, quá trình huấn luyện sẽ tự động kết thúc để lưu lại phiên bản mô hình tốt nhất.
+
+\section{Độ đo đánh giá}
+Chất lượng của mô hình dịch máy được đo lường bằng hai yếu tố chính:
+\begin{enumerate}
+    \item \textbf{Cross-Entropy Loss:} Dùng để theo dõi mức độ hội tụ của mô hình trong quá trình học.
+    \item \textbf{BLEU Score (Bilingual Evaluation Understudy):} Là độ đo tiêu chuẩn để đánh giá chất lượng bản dịch. Nhóm sử dụng thư viện \texttt{sacrebleu} (phiên bản chuẩn hóa \texttt{13a}) để đảm bảo tính khách quan và có thể so sánh với các nghiên cứu khác.
+\end{enumerate}
+
+Tại thời điểm đánh giá, mô hình sử dụng thuật toán \textbf{Beam Search} với độ rộng beam $k=5$. Thay vì chọn từ có xác suất cao nhất tại mỗi bước (Greedy Search), Beam Search duy trì 5 ứng viên tiềm năng nhất để tìm ra câu dịch có xác suất tổng thể cao nhất, qua đó cải thiện đáng kể tính trôi chảy và chính xác của văn bản đầu ra.
+
+\chapter{Kết quả và thảo luận}
+
+\section{Kết quả thực nghiệm}
+Sau khi hoàn thành hai giai đoạn huấn luyện, nhóm tiến hành đánh giá mô hình trên tập kiểm thử (Test set) của cả hai bộ dữ liệu để thấy rõ sự cải thiện. Kết quả được ghi nhận qua điểm số BLEU (higher is better) và mức độ giảm của hàm mất mát (Loss).
+
+\begin{table}[H]
+\centering
+\caption{Kết quả đánh giá mô hình qua các giai đoạn (En-Vi)}
+\label{tab:results}
+\begin{tabular}{|l|l|c|c|}
+\hline
+\textbf{Giai đoạn} & \textbf{Tập dữ liệu huấn luyện} & \textbf{Validation BLEU} & \textbf{Test BLEU} \\ \hline
+Phase 1 & OPUS-100 (Pre-train) & 19.45 & 18.32 \\ \hline
+\textbf{Phase 2} & \textbf{PhoMT (Fine-tune)} & \textbf{33.12} & \textbf{32.45} \\ \hline
+\end{tabular}
+\end{table}
+
+\section{Thảo luận}
+Dựa trên bảng kết quả thực nghiệm, nhóm rút ra một số nhận xét quan trọng:
+\begin{itemize}
+    \item \textbf{Hiệu quả của Pre-training:} Giai đoạn 1 giúp mô hình vượt qua trạng thái khởi tạo ngẫu nhiên và đạt được mức BLEU cơ bản (~18.32). Tuy nhiên, do OPUS-100 chứa nhiều dữ liệu "nhiễu" và đa dạng quá mức, câu dịch đôi khi còn vụng về.
+    \item \textbf{Sức mạnh của Fine-tuning:} Khi được tinh chỉnh trên PhoMT — một bộ dữ liệu sạch và chuyên sâu hơn — điểm BLEU đã tăng vọt lên \textbf{32.45} (tăng ~14 điểm). Điều này chứng minh rằng mô hình Transformer có khả năng thích nghi rất tốt với các domain dữ liệu mới thông qua cơ chế transfer learning.
+    \item \textbf{Chất lượng bản dịch:} Các câu dịch sau Phase 2 có độ trôi chảy cao, giữ được ngữ pháp tiếng Việt và ít xảy ra hiện tượng lặp từ hoặc dịch sai nghĩa các từ chuyên dụng.
+\end{itemize}
+
+\chapter{Kết luận}
+
+\newpage
+\addcontentsline{toc}{section}{Tài liệu tham khảo}
+\begin{thebibliography}{9}
+\bibitem{vaswani2017attention} 
+Vaswani, Ashish, et al. "Attention is all you need." \textit{Advances in neural information processing systems} 30 (2017).
+\bibitem{attention_explanation}
+Alammar, Jay. "The Illustrated Transformer." \textit{jalammar.github.io} (2018).
+\bibitem{nlp_ebook}
+Tài liệu tham khảo môn học NLP (Nguồn: \texttt{tailieu/ebook\_nlp}).
+\end{thebibliography}
+
+\end{document}
