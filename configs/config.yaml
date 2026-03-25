@@ -28,7 +28,7 @@ training:
   batch_size: 16
   warmup_steps: 4000
   patience: 3           # Early stopping: dừng sau N epoch BLEU không tăng
-  max_val_batches: 200  # Giới hạn số batch validation mỗi epoch (null = toàn bộ)
+  max_val_batches: 20   # Giới hạn số batch validation mỗi epoch (rút ngắn thời gian)
   val_batch_size: 32    # Batch size riêng cho validation (thường lớn hơn train)
   grad_clip: 0.5
   label_smoothing: 0.1
