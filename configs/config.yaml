@@ -9,10 +9,10 @@ model:
 # ────────────────────────── DATA ───────────────────────────
 data:
   train_sources:
-#    - data/PhoMT/train.csv
-    - data/opus100/train.csv
-  val_csv: data/opus100/dev.csv
-  test_csv: data/opus100/test.csv
+#    - dataset/PhoMT/train.csv
+    - dataset/opus100/train.csv
+  val_csv: dataset/opus100/dev.csv
+  test_csv: dataset/opus100/test.csv
   min_len: 1
   max_len: 128         
   max_len_ratio: 3.04

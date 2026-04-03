@@ -15,7 +15,7 @@ def load_model(
 
     Input Demo:
         checkpoint_path: 'checkpoints/best.pt'
-        tokenizer_path: 'data/tokenizer/en_vi.model'
+        tokenizer_path: 'dataset/tokenizer/en_vi.model'
     Output Demo:
         return: (Transformer, SentencePieceProcessor, device)
     """

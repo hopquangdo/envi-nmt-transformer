@@ -85,7 +85,7 @@ logs/
 # Data
 dataset/raw
 dataset/processed
-data/
+dataset/
 *.csv
 *.tsv
 *.jsonl

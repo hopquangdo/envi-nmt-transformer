@@ -97,7 +97,7 @@ def evaluate(config_path: str, max_samples=None):
     inf_cfg  = config["inference"]
     ckpt_cfg = config["checkpoint"]
     tok_cfg  = config["tokenizer"]
-    data_cfg = config["data"]
+    data_cfg = config["dataset"]
     train_cfg = config["training"]
 
     model, tokenizer, device = load_model(

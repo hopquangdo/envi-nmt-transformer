@@ -111,13 +111,13 @@ def download_phomt(out_dir: Path):
 # ─────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    base = Path(__file__).resolve().parent.parent / "data"
+    base = Path(__file__).resolve().parent.parent / "dataset"
 
     # download_opus100(base / "opus100")
     download_phomt(base / "PhoMT")
 
-    print("\n✅  Hoàn tất! Cấu trúc data/:")
+    print("\n✅  Hoàn tất! Cấu trúc dataset/:")
     for p in sorted(base.rglob("*.csv")):
         rel = p.relative_to(base)
         size_mb = p.stat().st_size / 1e6
-        print(f"   data/{rel}   ({size_mb:.1f} MB)")
+        print(f"   dataset/{rel}   ({size_mb:.1f} MB)")

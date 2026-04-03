@@ -35,7 +35,7 @@ def train(config_path: str, resume: str = "", init_model: str = ""):
     config      = load_config(config_path)
     model_cfg   = config["model"]
     train_cfg   = config["training"]
-    data_cfg    = config["data"]
+    data_cfg    = config["dataset"]
     ckpt_cfg    = config["checkpoint"]
     tok_cfg     = config["tokenizer"]
     inf_cfg     = config.get("inference", {})
