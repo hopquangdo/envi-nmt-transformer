@@ -239,10 +239,22 @@ def plot_all_layers(
     output_path: str = "outputs/attention_all_layers.png",
 ) -> str:
     """
-    Vẽ cross-attention heatmap cho tất cả decoder layers trong một figure lưới.
+    Vẽ cross-attention heatmap cho tất cả decoder layers trong một figure lưới (grid).
+
+    Hắe hình được lưu thành file PNG với nền tối (dark mode).
 
     Args:
-        head: None → trung bình tất cả heads; int → chỉ head đó
+        src_tokens (list[str]): Danh sách token câu nguồn (tiếng Anh, đã bỏ BOS/EOS).
+            Ví dụ: ['Hello', 'world'].
+        tgt_tokens (list[str]): Danh sách token câu đích (tiếng Việt, đã bỏ BOS/EOS).
+            Ví dụ: ['Xin', 'chào'].
+        cross_attns (list[np.ndarray]): Danh sách N attention matrices, mỗi phần tử tương ứng
+            với một decoder layer, shape (H, T_tgt_full, T_src_full).
+        head (int | None): Chọn head cụ thể để hiển thị. None = trung bình tất cả heads.
+        output_path (str): Đường dẫn file PNG đầu ra. Mặc định: 'outputs/attention_all_layers.png'.
+
+    Returns:
+        str: Đường dẫn tuyệt đối của file PNG đã lưu.
     """
     n_layers = len(cross_attns)
     n_src = len(src_tokens)

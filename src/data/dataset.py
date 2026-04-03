@@ -35,9 +35,30 @@ class TranslationDataset(Dataset):
         self.pad_id = self.spm.pad_id()
 
     def __len__(self):
+        """
+        Trả về tổng số cặp câu (En-Vi) trong dataset.
+
+        Returns:
+            int: Số lượng mẫu dữ liệu.
+        """
         return len(self.df)
 
     def __getitem__(self, idx):
+        """
+        Lấy một cặp câu đã được token hoá tại vị trí idx.
+
+        Thêm token <bos> ở đầu và <eos> ở cuối mỗi chuỗi,
+        sau đó cắt ngắn để không vượt quá max_len (tính cả BOS và EOS).
+
+        Args:
+            idx (int): Chỉ số của mẫu cần lấy.
+
+        Returns:
+            dict: {
+                "src": Tensor ID câu tiếng Anh (SeqLen_src,), ví dụ: [2, 15, 6, 3],
+                "tgt": Tensor ID câu tiếng Việt (SeqLen_tgt,), ví dụ: [2, 8, 12, 3].
+            }
+        """
         en_text = str(self.df.loc[idx, 'en'])
         vi_text = str(self.df.loc[idx, 'vi'])
 
@@ -91,12 +112,22 @@ def get_dataloader(
     max_len_ratio=9.0,
 ):
     """
-    Tạo nhanh bộ dữ liệu và trình tải dữ liệu (DataLoader).
+    Tạo TranslationDataset và DataLoader từ các file CSV.
 
-    Input Demo:
-        batch_size: 32
-    Output Demo:
-        return: (TranslationDataset, DataLoader)
+    Args:
+        data_sources (list[str] | str): Đường dẫn tới một hoặc nhiều file CSV chứa cột 'en' và 'vi'.
+        spm_model_path (str): Đường dẫn tới file SentencePiece model (.model).
+        batch_size (int): Số cặp câu trong mỗi batch khi train. Ví dụ: 32.
+        pad_id (int): ID của token <pad> dùng để padding các batch.
+        shuffle (bool): Xáo trộn dữ liệu trước mỗi epoch. Mặc định: True.
+        num_workers (int): Số worker song song để tải dữ liệu. Mặc định: 4.
+        min_len (int): Độ dài từ tối thiểu (word-level) của mỗi câu. Mặc định: 1.
+        max_len (int): Độ dài token tối đa sau khi encode (tính cả BOS/EOS). Mặc định: 128.
+        max_len_ratio (float): Tỉ lệ chiều dài tối đa giữa câu dài nhất và ngắn nhất
+            trong một cặp câu (lọc câu lệch quá nhiều). Mặc định: 9.0.
+
+    Returns:
+        tuple[TranslationDataset, DataLoader]: Dataset và DataLoader đã được cấu hình.
     """
     dataset = TranslationDataset(
         data_sources,

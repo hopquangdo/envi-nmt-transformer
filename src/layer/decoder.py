@@ -8,6 +8,20 @@ from src.layer.feed_forward import FeedForward
 
 class DecoderLayer(nn.Module):
     def __init__(self, d_model, num_heads, d_ff=2048, dropout=0.1):
+        """
+        Khởi tạo một lớp Decoder đơn (Single Decoder Layer).
+
+        Mỗi lớp gồm 3 sub-layer với cơ chế Pre-LN và Residual Connection:
+            1. Masked Multi-Head Self-Attention (chỉ nhìn các từ đã sinh ra phíd trước)
+            2. Cross-Attention với Encoder output (tập trung vào phần nguồn liên quan)
+            3. Position-wise Feed-Forward Network
+
+        Args:
+            d_model (int): Số chiều vector ẩn. Ví dụ: 512.
+            num_heads (int): Số head trong Multi-Head Attention. Ví dụ: 8.
+            d_ff (int): Chiều lớp ẩn Feed-Forward. Mặc định: 2048.
+            dropout (float): Tỉ lệ dropout. Mặc định: 0.1.
+        """
         super().__init__()
         # 1. Masked Self-Attention: Từ phía ngữ đích chỉ được phép nhìn các từ trước nó
         self.self_attn = MultiHeadAttention(d_model, num_heads, dropout)
@@ -23,15 +37,19 @@ class DecoderLayer(nn.Module):
 
     def forward(self, x, enc_out, src_mask=None, tgt_mask=None, return_attn: bool = False):
         """
-        Xử lý qua 1 lớp Decoder.
-        
-        Input Demo:
-            x: Tensor đích hiện tại (B, T_tgt, d_model) -> (32, 15, 512)
-            enc_out: Output từ Encoder (B, T_src, d_model) -> (32, 20, 512)
-            tgt_mask: (B, 1, T_tgt, T_tgt)
-            src_mask: (B, 1, 1, T_src)
-        Output Demo:
-            return: Tensor đặc trưng (B, T_tgt, d_model) -> (32, 15, 512)
+        Xử lý qua 1 lớp Decoder với Pre-LN và Residual Connection.
+
+        Args:
+            x (Tensor): Tensor token đích hiện tại, shape (B, T_tgt, d_model). Ví dụ: (32, 15, 512).
+            enc_out (Tensor): Output từ Encoder, shape (B, T_src, d_model). Ví dụ: (32, 20, 512).
+            src_mask (Tensor | None): Padding mask câu nguồn, shape (B, 1, 1, T_src). Ví dụ: (32, 1, 1, 20).
+            tgt_mask (Tensor | None): Causal + padding mask câu đích, shape (B, 1, T_tgt, T_tgt).
+                Ví dụ: (32, 1, 15, 15). Ngăn mô hình nhìn từ tương lai.
+            return_attn (bool): Nếu True, trả về thêm cross-attention weights. Mặc định: False.
+
+        Returns:
+            Tensor: Tensor đặc trưng được cập nhật, shape (B, T_tgt, d_model). Ví dụ: (32, 15, 512).
+            Tensor (tuỳ chọn): Cross-attention weights shape (B, H, T_tgt, T_src) khi return_attn=True.
         """
         # Pre-LN: norm TRƯỚC sublayer — ổn định hơn với AMP/FP16
         normed = self.norm1(x)
@@ -59,6 +77,23 @@ class DecoderLayer(nn.Module):
 class Decoder(nn.Module):
     def __init__(self, vocab_size, d_model, num_layers, num_heads,
                  d_ff=2048, dropout=0.1, max_len=512, pad_idx=0, weight_tying=True):
+        """
+        Khởi tạo bộ Decoder gồm N lớp DecoderLayer xếp chồng.
+
+        Luồng xử lý: Token IDs → Embedding → Scale → PE → N × DecoderLayer → LayerNorm → Linear (logits).
+
+        Args:
+            vocab_size (int): Kích thước từ điển đích (tiếng Việt). Ví dụ: 32000.
+            d_model (int): Số chiều vector ẩn. Ví dụ: 512.
+            num_layers (int): Số lớp DecoderLayer xếp chồng. Ví dụ: 6.
+            num_heads (int): Số head trong Multi-Head Attention. Ví dụ: 8.
+            d_ff (int): Chiều lớp ẩn Feed-Forward. Mặc định: 2048.
+            dropout (float): Tỉ lệ dropout. Mặc định: 0.1.
+            max_len (int): Độ dài chuỗi tối đa cho Positional Encoding. Mặc định: 512.
+            pad_idx (int): ID của token <pad>. Mặc định: 0.
+            weight_tying (bool): Nếu True, chia sẻ trọng số giữa Embedding và lớp Linear cuối
+                để giảm số tham số và tái sử dụng không gian ngữ nghĩa. Mặc định: True.
+        """
         super().__init__()
         self.d_model = d_model
         self.embed = nn.Embedding(vocab_size, d_model, padding_idx=pad_idx)
@@ -80,12 +115,18 @@ class Decoder(nn.Module):
     def forward(self, x, enc_out, src_mask=None, tgt_mask=None, return_attn: bool = False):
         """
         Xử lý qua toàn bộ bộ Decoder (gồm N lớp xếp chồng).
-        
-        Input Demo:
-            x: Tensor IDs đích (B, T_tgt) -> (32, 15)
-            enc_out: Output từ Encoder (B, T_src, d_model) -> (32, 20, 512)
-        Output Demo:
-            return: Logits (B, T_tgt, vocab_size) -> (32, 15, 20000)
+
+        Args:
+            x (Tensor): Tensor ID câu đích, shape (B, T_tgt). Ví dụ: (32, 15).
+            enc_out (Tensor): Output từ Encoder, shape (B, T_src, d_model). Ví dụ: (32, 20, 512).
+            src_mask (Tensor | None): Padding mask câu nguồn, shape (B, 1, 1, T_src).
+            tgt_mask (Tensor | None): Causal + padding mask câu đích, shape (B, 1, T_tgt, T_tgt).
+            return_attn (bool): Nếu True, trả thêm danh sách cross-attention weights của mọi lớp.
+
+        Returns:
+            Tensor: Logits dự đoán từ vựng, shape (B, T_tgt, vocab_size). Ví dụ: (32, 15, 32000).
+            list[Tensor] (tuỳ chọn): Danh sách N cross-attention weights, mỗi phần tử shape (B, H, T_tgt, T_src)
+                khi return_attn=True. Dùng để trực quan hóa (visualize).
         """
         # Bước 1 & 2 giống như ở Encoder: Nhúng token và cộng thêm vị trí
         x = self.embed(x) * math.sqrt(self.d_model)

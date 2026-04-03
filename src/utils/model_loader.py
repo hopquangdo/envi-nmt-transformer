@@ -13,11 +13,26 @@ def load_model(
     """
     Tải mô hình Transformer và bộ Tokenizer từ checkpoint đã train.
 
-    Input Demo:
-        checkpoint_path: 'checkpoints/best.pt'
-        tokenizer_path: 'dataset/tokenizer/en_vi.model'
-    Output Demo:
-        return: (Transformer, SentencePieceProcessor, device)
+    Hỗ trợ 2 định dạng checkpoint:
+        1. Dict đầy đủ: {'model': state_dict, 'optimizer': ..., 'epoch': ...}
+        2. state_dict thuần túy (chỉ lưu trọng số mô hình)
+
+    Args:
+        checkpoint_path (str): Đường dẫn đến file checkpoint (.pt). Ví dụ: 'checkpoints/best_model.pt'.
+        tokenizer_path (str): Đường dẫn đến file SentencePiece model (.model).
+            Ví dụ: 'models/spm_tokenizer.model'.
+        device (torch.device | None): Thiết bị chạy. Nếu None, tự động chọn CUDA
+            nếu có sẵn, ngược lại sử dụng CPU.
+
+    Returns:
+        tuple[Transformer, SentencePieceProcessor, torch.device]:
+            - model: Mô hình Transformer đã load trọng số, được đặt sang eval() mode.
+            - tokenizer: Bộ SentencePiece tokenizer đã tải.
+            - device: Thiết bị đang chạy thực tế.
+
+    Raises:
+        FileNotFoundError: Gán ra nếu checkpoint_path hoặc tokenizer_path không tồn tại.
+        RuntimeError: Nếu state_dict không khớp với kiến trúc mô hình trong config.
     """
     config = load_config("configs/config.yaml")
     model_config = config["model"]

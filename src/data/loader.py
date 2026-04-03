@@ -94,13 +94,25 @@ def is_valid_pair(
     max_len_ratio: float = 9.0,
 ) -> bool:
     """
-    Bộ lọc cặp câu Anh-Việt (Moses/fairseq style).
+    Lọc cặp câu Anh-Việt theo tiêu chuẩn tiền xử lý NMT (Moses/fairseq style).
 
-    Input Demo:
-        en: 'Hello'
-        vi: 'Xin chào'
-    Output Demo:
-        return: True (Nếu thoả mãn các tiêu chí lọc)
+    Một cặp hợp lệ phải vượt qua tất cả các tiêu chí sau:
+        1. Không được rỗng (cả en lẫn vi).
+        2. Độ dài (word-level) nằm trong khoảng [min_len, max_len].
+        3. Tỉ lệ chiều dài (len_max / len_min) không vượt quá max_len_ratio.
+        4. Hai câu không giống hệt nhau (en ≠ vi sau khi lowercase).
+        5. Tỉ lệ ký tự chữ cái (alpha ratio) >= 40% ở cả hai câu (loại câu toàn số/ký hiệu).
+        6. Không phải câu chỉ gồm dấu chấm lửng (ellipsis-only).
+
+    Args:
+        en (str): Câu tiếng Anh đã làm sạch.
+        vi (str): Câu tiếng Việt đã làm sạch.
+        min_len (int): Số từ tối thiểu. Mặc định: 1.
+        max_len (int): Số từ tối đa. Mặc định: 200.
+        max_len_ratio (float): Tỉ lệ chiều dài tối đa cho phép. Mặc định: 9.0.
+
+    Returns:
+        bool: True nếu cặp câu hợp lệ, False nếu cần loại bỏ.
     """
     if not en or not vi:
         return False
@@ -146,7 +158,29 @@ def _load_single(
     max_len: int,
     max_len_ratio: float,
 ) -> pd.DataFrame:
-    """Load và clean 1 file CSV. Dùng nội bộ bởi load_dataset()."""
+    """
+    Tải và làm sạch một file CSV dữ liệu song ngữ En-Vi.
+
+    Hàm nội bộ, được gọi bởi load_dataset(). Thực hiện:
+        1. Đọc CSV và chuẩn hoá tên cột về chữ thường.
+        2. Kiểm tra sự tồn tại của cột 'en' và 'vi'.
+        3. Áp dụng pipeline clean_text() cho từng câu.
+        4. Lọc các cặp câu không hợp lệ qua is_valid_pair().
+
+    Args:
+        csv_path (str): Đường dẫn tới file CSV. File phải có cột 'en' và 'vi'.
+        min_len (int): Số từ tối thiểu per câu để giữ lại.
+        max_len (int): Số từ tối đa per câu để giữ lại.
+        max_len_ratio (float): Tỉ lệ chiều dài tối đa giữa hai câu trong cặp.
+
+    Returns:
+        pd.DataFrame: DataFrame với cột ['en', 'vi'] đã làm sạch và lọc,
+            với index được reset về 0.
+
+    Raises:
+        FileNotFoundError: Nếu file CSV không tồn tại tại csv_path.
+        ValueError: Nếu file CSV không có cột 'en' hoặc 'vi'.
+    """
     path = Path(csv_path)
     if not path.exists():
         raise FileNotFoundError(f"Không tìm thấy file: {csv_path}")
@@ -192,12 +226,26 @@ def load_dataset(
     seed: int = 42,
 ) -> pd.DataFrame:
     """
-    Tải và xử lý sạch nhiều file CSV En↔Vi.
+    Tải và xử lý sạch nhiều file CSV song ngữ En↔Vi, gộp thành một DataFrame.
 
-    Input Demo:
-        csv_paths: ['dataset/train.csv']
-    Output Demo:
-        return: DataFrame (Cột 'en', 'vi' đã sạch)
+    API công khai dùng bởi dataset.py và tokenizer.py.
+
+    Args:
+        csv_paths (list[str] | str): Một hoặc nhiều đường dẫn tới file CSV.
+            Mỗi file phải có cột 'en' và 'vi'.
+        min_len (int): Số từ tối thiểu per câu. Mặc định: 1.
+        max_len (int): Số từ tối đa per câu. Mặc định: 200.
+        max_len_ratio (float): Tỉ lệ chiều dài tối đa giữa hai câu. Mặc định: 9.0.
+        deduplicate (bool): Loại bỏ các cặp câu trùng lặp giữa các file. Mặc định: True.
+        shuffle (bool): Xáo trộn ngẫu nhiên kết quả cuối cùng. Mặc định: False.
+        seed (int): Seed cho random shuffle để đảm bảo tái lập. Mặc định: 42.
+
+    Returns:
+        pd.DataFrame: DataFrame với cột ['en', 'vi'] đã làm sạch, lọc và tùy chọn dedup/shuffle.
+
+    Example:
+        >>> df = load_dataset(["dataset/PhoMT/train.csv", "dataset/opus100/train.csv"])
+        >>> len(df)  # Số cặp câu hợp lệ sau khi xử lý
     """
     if isinstance(csv_paths, str):
         csv_paths = [csv_paths]
