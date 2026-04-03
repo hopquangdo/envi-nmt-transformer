@@ -1,41 +1,39 @@
-EnVi Neural Machine Translation (Transformer)
+# Dịch máy Nural Anh-Việt (Transformer)
 
-A Neural Machine Translation (NMT) system for English ↔ Vietnamese built
-with Transformer architecture.\
-This project focuses on training, evaluation, and deployment-ready
-translation models using modern deep learning techniques.
+Hệ thống Dịch máy Neural (NMT) cho cặp ngôn ngữ Tiếng Anh ↔ Tiếng Việt được xây dựng dựa trên kiến trúc Transformer.
+Dự án này tập trung vào việc huấn luyện, đánh giá và triển khai các mô hình dịch thuật sử dụng các kỹ thuật học sâu hiện đại.
 
 ------------------------------------------------------------------------
 
-## Features
+## Các tính năng chính
 
--   Transformer-based encoder-decoder architecture
--   Multi-head attention (custom implementation)
--   Support for PhoMT & OPUS100 datasets
--   Beam search decoding
--   Training & evaluation pipeline
--   Config-driven experiments
+-   Kiến trúc Encoder-Decoder dựa trên Transformer
+-   Cơ chế Multi-head attention (tự triển khai)
+-   Hỗ trợ tập dữ liệu PhoMT & OPUS100
+-   Giải mã bằng Beam search
+-   Quy trình huấn luyện & đánh giá hoàn chỉnh
+-   Quản lý thí nghiệm thông qua tệp cấu hình (Config-driven)
 
 ------------------------------------------------------------------------
 
-## Project Structure
+## Cấu trúc dự án
 
     .
     ├── src/
-    │   ├── models/        # Transformer, attention, etc.
-    │   ├── data/          # Dataset processing
-    │   ├── train.py       # Training script
-    │   ├── evaluate.py    # Evaluation script
-    │   └── utils/         # Helpers
-    ├── configs/           # YAML config files
-    ├── checkpoints/       # Saved models
-    ├── data/              # Raw & processed data
+    │   ├── models/        # Transformer, attention, v.v.
+    │   ├── data/          # Xử lý tập dữ liệu
+    │   ├── train.py       # Script huấn luyện
+    │   ├── evaluate.py    # Script đánh giá
+    │   └── utils/         # Các hàm bổ trợ
+    ├── configs/           # Các tệp cấu hình YAML
+    ├── checkpoints/       # Lưu trữ mô hình đã huấn luyện
+    ├── data/              # Dữ liệu thô & đã xử lý
     ├── requirements.txt
     └── README.md
 
 ------------------------------------------------------------------------
 
-##  Installation
+## Cài đặt
 
 ``` bash
 git clone https://github.com/your-username/envi-nmt-transformer.git
@@ -50,7 +48,7 @@ pip install -r requirements.txt
 
 ------------------------------------------------------------------------
 
-## Training
+## Huấn luyện
 
 ``` bash
 python src/train.py --config configs/config.yaml
@@ -58,7 +56,7 @@ python src/train.py --config configs/config.yaml
 
 ------------------------------------------------------------------------
 
-## Evaluation
+## Đánh giá
 
 ``` bash
 python src/evaluate.py --checkpoint checkpoints/best_model.pt
@@ -66,40 +64,43 @@ python src/evaluate.py --checkpoint checkpoints/best_model.pt
 
 ------------------------------------------------------------------------
 
-## Model
+## Mô hình
 
--   Architecture: Transformer (Encoder-Decoder)
--   Attention: Multi-Head Attention
--   Loss: Cross-Entropy
--   Optimization: Adam / AdamW
+-   Kiến trúc: Transformer (Encoder-Decoder)
+-   Cơ chế Attention: Multi-Head Attention
+-   Hàm mất mát (Loss): Cross-Entropy
+-   Tối ưu hóa (Optimization): Adam / AdamW
 
 ------------------------------------------------------------------------
 
-## Dataset
+## Tập dữ liệu
 
--   PhoMT (Vietnamese-English)
+-   PhoMT (Tiếng Việt-Tiếng Anh)
 -   OPUS100
 
-Preprocessing includes: - Tokenization - Cleaning & normalization -
-Padding & batching
+Tiền xử lý bao gồm: - Tokenization - Làm sạch & chuẩn hóa - Padding & batching
 
 ------------------------------------------------------------------------
 
-## Results
+## Kết quả
 
-  Model         BLEU
-  ------------- ------
-  Transformer   XX.X
-
-*(Update after training)*
+| Mô hình           | Val BLEU ↑ | Test BLEU ↑ |
+| ----------------- | :----------: | :-----------: |
+| Google Translate  | 40.10      | 39.86       |
+| Bing Translator   | 40.82      | 40.37       |
+| Transformer-base  | 43.01      | 42.12       |
+| Transformer-big   | 43.75      | 42.94       |
+| mBART              | 44.32      | 43.46       |
+| **Our (Nhóm tôi)**| **35.1**   | **28.62**   |
 
 ------------------------------------------------------------------------
 
-## Future Work
+## Định hướng phát triển
 
--   Fine-tune pretrained models (PhoMT, mT5)
--   Add inference API (FastAPI)
--   Improve decoding (Top-k, nucleus sampling)
--   Mixed precision training (FP16)
+-   Tinh chỉnh các mô hình đã huấn luyện trước (PhoMT, mT5)
+-   Thêm API suy luận (FastAPI)
+-   Cải thiện giải mã (Top-k, nucleus sampling)
+-   Huấn luyện với độ chính xác hỗn hợp (Mixed precision - FP16)
+
 
 
