@@ -11,7 +11,13 @@ def load_model(
     device: torch.device = None
 ):
     """
-    Load model + tokenizer (dùng chung cho inference & evaluate)
+    Tải mô hình Transformer và bộ Tokenizer từ checkpoint đã train.
+
+    Input Demo:
+        checkpoint_path: 'checkpoints/best.pt'
+        tokenizer_path: 'data/tokenizer/en_vi.model'
+    Output Demo:
+        return: (Transformer, SentencePieceProcessor, device)
     """
     config = load_config("configs/config.yaml")
     model_config = config["model"]

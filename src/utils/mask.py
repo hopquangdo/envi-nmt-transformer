@@ -4,30 +4,31 @@ import torch
 
 def create_src_mask(src: torch.Tensor, pad_idx: int = 0) -> torch.Tensor:
     """
-    Tạo padding mask cho encoder.
+    Tạo padding mask cho bộ Encoder để bỏ qua các ký tự <pad>.
 
-    Args:
-        src:     (B, T_src) — token ids
-        pad_idx: index của <pad> token
+    Input Demo:
+        src: Tensor shape (B, T_src) -> ví dụ: torch.tensor([[1, 2, 3, 0, 0]]) (Batch=1, SeqLen=5)
+        pad_idx: 0
 
-    Returns:
-        mask: (B, 1, 1, T_src) — 1 = vị trí hợp lệ, 0 = padding
+    Output Demo:
+        return: Tensor shape (B, 1, 1, T_src) -> torch.tensor([[[[True, True, True, False, False]]]])
     """
     return (src != pad_idx).unsqueeze(1).unsqueeze(2)
 
 
 def create_tgt_mask(tgt: torch.Tensor, pad_idx: int = 0) -> torch.Tensor:
     """
-    Tạo combined mask cho decoder:
-      - Padding mask (tránh attend vào <pad>)
-      - Causal mask (tránh attend vào tương lai)
+    Tạo mask kết hợp cho bộ Decoder:
+      1. Padding mask: Tránh nhìn vào các ký tự <pad>.
+      2. Causal mask (Look-ahead mask): Tránh nhìn vào các từ ở "tương lai".
 
-    Args:
-        tgt:     (B, T_tgt) — token ids
-        pad_idx: index của <pad> token
+    Input Demo:
+        tgt: Tensor shape (B, T_tgt) -> ví dụ: torch.tensor([[5, 6, 0]])
+        pad_idx: 0
 
-    Returns:
-        mask: (B, 1, T_tgt, T_tgt) — 1 = cho phép, 0 = chặn
+    Output Demo:
+        return: Tensor shape (B, 1, T_tgt, T_tgt)
+        Giải thích: Kết quả là ma trận tam giác dưới để mỗi từ chỉ nhìn được chính nó và các từ trước đó.
     """
     B, T = tgt.size()
 

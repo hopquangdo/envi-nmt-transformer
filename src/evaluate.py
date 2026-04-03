@@ -25,6 +25,14 @@ def evaluate_bleu(
     """
     Dịch toàn bộ (hoặc một phần) tập validation/test bằng model,
     trả về BLEU score.
+
+    Input Demo:
+        model: Transformer model đã train.
+        val_loader: DataLoader chứa tập dữ liệu validation.
+        tokenizer: SentencePieceProcessor.
+        beam_size: 4 (Số lượng chùm tìm kiếm).
+    Output Demo:
+        return: float (ví dụ: 35.5 - Điểm số BLEU càng cao càng tốt).
     """
     translator = Translator(
         model=model,
@@ -76,6 +84,15 @@ def evaluate_bleu(
 
 
 def evaluate(config_path: str, max_samples=None):
+    """
+    Hàm main điều khiển quá trình đánh giá BLEU từ file cấu hình.
+
+    Input Demo:
+        config_path: 'configs/config.yaml'
+        max_samples: 100 (Để test nhanh thay vì chạy hết tập test).
+    Output Demo:
+        return: score (float) - Điểm BLEU cuối cùng.
+    """
     config   = load_config(config_path)
     inf_cfg  = config["inference"]
     ckpt_cfg = config["checkpoint"]

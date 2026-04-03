@@ -24,6 +24,14 @@ from src.evaluate import evaluate_bleu
 # ─────────────────────────────────────────────────────────────
 
 def train(config_path: str, resume: str = "", init_model: str = ""):
+    """
+    Hàm chính thực hiện quá trình huấn luyện (Training Loop).
+
+    Input Demo:
+        config_path: 'configs/config.yaml' (Đường dẫn file cấu hình).
+        resume: 'checkpoints/latest.pt' (Tiếp tục train từ checkpoint đầy đủ).
+        init_model: 'checkpoints/best.pt' (Chỉ lấy trọng số model, bắt đầu epoch 0).
+    """
     config      = load_config(config_path)
     model_cfg   = config["model"]
     train_cfg   = config["training"]

@@ -17,6 +17,14 @@ class Translator:
         self.model.eval()
 
     def encode(self, text):
+        """
+        Chuẩn hóa văn bản đầu vào thành ID và thực hiện Encoder.
+
+        Input Demo:
+            text: 'Hello world'
+        Output Demo:
+            return: (enc, mask) -> enc: (1, T_src, d_model), mask: (1, 1, 1, T_src)
+        """
         ids = self.tokenizer.encode(text)
         src = [self.bos_id] + ids[: self.max_len - 2] + [self.eos_id]
 
@@ -27,6 +35,15 @@ class Translator:
         return enc, mask
 
     def translate(self, text, method="beam", beam_size=5):
+        """
+        Dịch một câu văn bản hoàn chỉnh.
+
+        Input Demo:
+            text: 'Hello world'
+            method: 'beam' hoặc 'greedy'
+        Output Demo:
+            return: 'Xin chào thế giới'
+        """
         enc, mask = self.encode(text)
 
         if method == "greedy":

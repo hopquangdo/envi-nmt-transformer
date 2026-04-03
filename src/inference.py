@@ -6,6 +6,14 @@ from src.utils.model_loader import load_model
 
 
 def main(config_path: str):
+    """
+    Hàm khởi chạy giao dịch dịch văn bản tương tác qua terminal.
+
+    Input Demo:
+        config_path: 'configs/config.yaml'
+    Output Demo:
+        (Hiển thị kết quả dịch trực tiếp trên terminal)
+    """
     config   = load_config(config_path)
     inf_cfg  = config["inference"]
     ckpt_cfg = config["checkpoint"]

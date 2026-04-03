@@ -23,7 +23,14 @@ class PositionalEncoding(nn.Module):
         self.register_buffer("pe", pe)
 
     def forward(self, x):
-        """x: (B, T, d_model)"""
+        """
+        Cộng thêm mã hóa vị trí vào vector nhúng để mô hình biết thứ tự các từ.
+        
+        Input Demo:
+            x: Tensor shape (B, T, d_model) -> (32, 20, 512)
+        Output Demo:
+            return: Tensor shape (B, T, d_model) -> (32, 20, 512)
+        """
         T = x.size(1)
         x = x + self.pe[:, :T]
         return self.dropout(x)
