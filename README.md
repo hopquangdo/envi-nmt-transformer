@@ -1,4 +1,4 @@
-# Dịch máy Nural Anh-Việt (Transformer)
+# Dịch máy Neural Anh-Việt (Transformer)
 
 Hệ thống Dịch máy Neural (NMT) cho cặp ngôn ngữ Tiếng Anh ↔ Tiếng Việt được xây dựng dựa trên kiến trúc Transformer.
 Dự án này tập trung vào việc huấn luyện, đánh giá và triển khai các mô hình dịch thuật sử dụng các kỹ thuật học sâu hiện đại.
@@ -65,6 +65,8 @@ python src/evaluate.py --checkpoint checkpoints/best_model.pt
 ------------------------------------------------------------------------
 
 ## Mô hình
+
+![Kiến trúc Transformer](https://upload.wikimedia.org/wikipedia/commons/9/91/Full_Transformer.png)
 
 -   Kiến trúc: Transformer (Encoder-Decoder)
 -   Cơ chế Attention: Multi-Head Attention

@@ -97,3 +97,6 @@ dataset/
 *.model
 temp_corpus.txt
 tokenizer.json
+
+# Latex
+latex/
