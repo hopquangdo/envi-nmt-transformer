@@ -66,7 +66,7 @@ python src/evaluate.py --checkpoint checkpoints/best_model.pt
 
 ## Mô hình
 
-![Kiến trúc Transformer](https://upload.wikimedia.org/wikipedia/commons/9/91/Full_Transformer.png)
+![Kiến trúc Transformer](assets/transformer_architecture.png)
 
 -   Kiến trúc: Transformer (Encoder-Decoder)
 -   Cơ chế Attention: Multi-Head Attention
