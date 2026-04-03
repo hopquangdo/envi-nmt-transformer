@@ -91,6 +91,7 @@ class Decoder(nn.Module):
         x = self.embed(x) * math.sqrt(self.d_model)
         x = self.pe(x)
 
+        # Bước 3
         all_cross_attns = []
         for layer in self.layers:
             if return_attn:

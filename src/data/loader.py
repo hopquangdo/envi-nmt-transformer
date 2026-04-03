@@ -8,7 +8,7 @@ Chuẩn tham khảo:
   - Helsinki-NLP opus-mt preprocessing
   - VLSP / PhoNLP corpus guidelines
 
->>> from src.dataset.loader import load_dataset
+>>> from src.data.loader import load_dataset
 >>> df = load_dataset(["dataset/PhoMT/train.csv", "dataset/opus100/train.csv"])
 """
 
